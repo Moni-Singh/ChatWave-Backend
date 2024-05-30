@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 import User, { IUser } from "../models/User";
 require("dotenv").config();
+import { ObjectId } from "mongodb";
 const blacklist: Set<string> = new Set();
 
 //Register
@@ -71,9 +72,8 @@ export const loginUser = async (req: Request, res: Response) => {
     if (!passwordMatch) {
       return res.status(401).json({ message: "Invalid password" });
     }
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+
     res.status(200).json({
       id: user._id,
       name: user.username,
