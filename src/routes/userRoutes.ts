@@ -6,6 +6,7 @@ const user_route = express();
 const user_controller = require("../controllers/authController");
 const product_controller = require("../controllers/productControllers")
 const document_controller = require("../controllers/documentControllers")
+const fcmToken_controller = require("../controllers/fcmTokenController")
 user_route.use(express.json());
 const path = require("path");
 // const {verifyToken,isAdmin}= require('../middleware/authmiddleware')
@@ -27,5 +28,6 @@ user_route.put('/updateProduct/:id',product_controller.updateProduct);
 user_route.post('/document',document_controller.addDocument);
 user_route.get('/getAllDocument',document_controller.getAllDocument);
 
+user_route.post('/fcmToken',fcmToken_controller.addFCMToken);
 
 export default user_route;
