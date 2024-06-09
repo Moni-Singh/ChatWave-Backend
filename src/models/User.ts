@@ -1,6 +1,13 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
 import bcrypt from "bcrypt";
 
+import { Request } from "express";
+
+export interface IUserRequest extends Request {
+  user?: any;
+  userId?: string;
+}
+
 export interface IUser extends Document {
   firstname: string;
   lastname: string;

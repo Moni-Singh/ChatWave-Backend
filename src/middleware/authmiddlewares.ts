@@ -1,46 +1,40 @@
+import jwt from "jsonwebtoken";
+import { NextFunction, Response } from "express";
+import asyncHandler from "express-async-handler";
+import User from "../models/User";
+import { IUserRequest } from "../models/User"; // Adjust the import path as needed
 
-// import { Request, Response, NextFunction } from 'express';
-// import { ROLES } from '../constants/constants';
-// import jwt, { Secret } from 'jsonwebtoken';
-// import SECRET_KEY from '../config/Config';
-// import asyncHandler from "express-async-handler";
-// import User, { IUserRequest } from "../models/User";
+export const protect = asyncHandler(
+  async (req: IUserRequest, res: Response, next: NextFunction) => {
+    let token;
 
-// // export const protect = asyncHandler(
-// //   async (req: Request, res: Response, next: NextFunction) => {
-// //     let token;
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      try {
+        const JWT_SECRET = process.env.JWT_SECRET || "monisingh123";
+        token = req.headers.authorization.split(" ")[1];
+        const decodeToken: any = jwt.verify(token, JWT_SECRET);
+        console.log("Decoded token:", decodeToken);
 
-// //     if (
-// //       req.headers.authorization &&
-// //       req.headers.authorization.startsWith('Bearer')
-// //     ) {
-// //       try {
-// //         const JWT_SECRET = 'abc123';
-// //         token = req.headers.authorization.split(' ')[1];
-// //         const decoded: any = jwt.verify(token, JWT_SECRET as string);
+        const user = await User.findById(decodeToken.id).select("-password");
+        if (!user) {
+          res.status(401);
+          throw new Error("User not found");
+        }
 
-// //         req.user = await User.findById(decoded.id).select('-password');
+        req.user = user; // Adding user to req
+        req.userId = decodeToken.id; // Adding userId to req
 
-// //         next();
-// //       } catch (error: any) {
-// //         res.status(401);
-// //         throw new Error('No token, no auth');
-// //       }
-// //     }
-
-// //     if (!token) {
-// //       res.status(401);
-// //       throw new Error('No token, no auth');
-// //     }
-// //   }
-// // );
-
-// export const checkAdminRole = (req: Request, res: Response, next: NextFunction) => {
-//   const { user } = req as any; 
-
-//   if (user.role !== ROLES.ADMIN) {
-//     return res.status(403).json({ message: 'Unauthorized: Only admin users can perform this action' });
-//   }
-
-//   next();
-// };
+        next();
+      } catch (error: any) {
+        res.status(401);
+        throw new Error("Not authorized, token failed");
+      }
+    } else {
+      res.status(401);
+      throw new Error("Not authorized, no token");
+    }
+  }
+);
