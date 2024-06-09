@@ -17,7 +17,7 @@ export const userChatMessage = async (req: Request, res: Response) => {
         .json({ message: "Authorization header is missing" });
     }
 
-    const token = authorizationHeader && authorizationHeader.split("")[1];
+    const token = authorizationHeader && authorizationHeader.split(" ")[1];
     if (!token) {
       return false;
     }
