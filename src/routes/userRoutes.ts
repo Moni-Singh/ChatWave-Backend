@@ -3,6 +3,7 @@ const { verify } = require("jsonwebtoken");
 const user_route = express();
 
 const user_controller = require("../controllers/authController");
+const fcmToken_controller = require("../controllers/fcmTokenController")
 const product_controller = require("../controllers/productControllers");
 const document_controller = require("../controllers/documentControllers");
 const regiseterUserList_controller = require("../controllers/userList");
@@ -35,6 +36,7 @@ user_route.get("/userList/:id");
 
 //ChatMessage
 
+user_route.post('/fcmToken',fcmToken_controller.addFCMToken);
 user_route.post("/sendMessage", messageContent_controller.addMesssageContent);
 user_route.post("/chat/message", userChatMessage_controller.userChatMessage);
 
